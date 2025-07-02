@@ -1,0 +1,10 @@
+require("dotenv").config(); // Optional here if already called globally
+
+const jwt = require("jsonwebtoken");
+
+const getToken = async (email, user) => {
+  const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET);
+  return token;
+};
+
+module.exports = { getToken };
