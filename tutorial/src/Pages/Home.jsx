@@ -2,8 +2,13 @@ import React from "react";
 import DestinationCard from "../components/DestinationCard";
 import destinationData from "../Data/AlldestinationsData";
 import hero from "../assets/images/hero.jpg";
+import { useNavigate } from "react-router-dom";
 
 function Home() {
+  const navigate = useNavigate();
+    const handle = () => {
+      navigate("/plan")
+    }
   return (
     <div>
 
@@ -19,7 +24,7 @@ function Home() {
           <p className="text-lg md:text-xl max-w-xl">
             Find your perfect destination and plan your next adventure with ease.
           </p>
-          <button className="mt-6 px-6 py-3 bg-white text-black font-semibold rounded-full hover:bg-gray-200 transition">
+          <button className="mt-6 px-6 py-3 bg-white text-black font-semibold rounded-full hover:bg-gray-200 transition" onClick={handle}>
             Start Planning ✈️
           </button>
         </div>

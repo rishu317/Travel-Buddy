@@ -1,5 +1,3 @@
-// src/pages/Destinations.jsx
-
 import React, { useState } from "react";
 import DestinationCard from "../components/DestinationCard";
 import destinationData from "../Data/AlldestinationsData";
@@ -8,7 +6,7 @@ import Contries from "../components/DestinationsForContries";
 const Destinations = () => {
   const [searchTerm, setSearchTerm] = useState("");
 
-  // Filter all destinations based on search input
+  // Filter based on title or location
   const filteredDestinations = destinationData.filter((dest) =>
     dest.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
     dest.location.toLowerCase().includes(searchTerm.toLowerCase())
@@ -19,7 +17,7 @@ const Destinations = () => {
       {/* Page Title */}
       <section className="text-center mb-8">
         <h1 className="text-4xl font-bold text-blue-700 w-auto">
-          Explore Destinations over the world
+          Explore worlds's most beautiful destinations
         </h1>
         <p className="text-gray-600 mt-2 text-lg">
           Find your perfect getaway from our top travel picks.
@@ -41,8 +39,10 @@ const Destinations = () => {
             🔍
           </button>
         </div>
+      </section>
 
-        {/* Country Filter Tabs */}
+      {/* Country Tabs */}
+      <section className="w-full text-gray-900 flex mb-10">
         <Contries />
       </section>
 

@@ -3,6 +3,8 @@ import { toast } from "react-toastify";
 import { makeAuthenticatedPOSTRequest } from "../utils/serverHelpers";
 
 function TripForm({ onAddTrip, prefilled = {} }) {
+  const USD_TO_INR = 85.6;
+
   const countryCodes = [
     { name: "Afghanistan", code: "+93" },
     { name: "Albania", code: "+355" },
@@ -103,11 +105,14 @@ function TripForm({ onAddTrip, prefilled = {} }) {
     { name: "USA", code: "+1" },
     { name: "Uzbekistan", code: "+998" },
     { name: "Vietnam", code: "+84" },
-    { name: "Yemen", code: "+967" },
+    { name: "Yemen", code: "+967" },  
   ];
 
-  // Calculate base price per day if prefilled
-  const basePricePerDay = prefilled.budget ? prefilled.budget / 6 : 0;
+  // Convert USD to INR if prefilled budget exists
+  const prefilledBudgetINR = prefilled.budget ? Math.round(prefilled.budget * USD_TO_INR) : 0;
+
+  // Base price per day in INR (default duration = 6 days)
+  const basePricePerDay = prefilledBudgetINR ? prefilledBudgetINR / 6 : 0;
 
   const [formData, setFormData] = useState({
     name: "",
@@ -115,13 +120,12 @@ function TripForm({ onAddTrip, prefilled = {} }) {
     countryCode: "+91",
     from: "",
     destination: prefilled.destination || "",
-    budget: prefilled.budget || "",
+    budget: prefilledBudgetINR || "",
     people: 1,
     date: "",
-    duration: prefilled.budget ? 6 : "", // default 6 days if prefilled
+    duration: prefilledBudgetINR ? 6 : "",
   });
 
-  // ------------------ Handle Form Inputs -------------------
   const handleChange = (e) => {
     const { name, value } = e.target;
 
@@ -136,15 +140,14 @@ function TripForm({ onAddTrip, prefilled = {} }) {
     }));
   };
 
-  // ------------------ Auto-update Budget -------------------
+  // Auto-update budget in INR based on people and duration
   useEffect(() => {
-    if (prefilled.budget && formData.duration && formData.people) {
+    if (prefilledBudgetINR && formData.duration && formData.people) {
       const updatedBudget = basePricePerDay * formData.duration * formData.people;
       setFormData((prev) => ({ ...prev, budget: Math.round(updatedBudget) }));
     }
   }, [formData.duration, formData.people]);
 
-  // ------------------ Handle Form Submit -------------------
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -176,7 +179,7 @@ function TripForm({ onAddTrip, prefilled = {} }) {
         budget: "",
         people: 1,
         date: "",
-        duration: prefilled.budget ? 6 : "",
+        duration: prefilledBudgetINR ? 6 : "",
       });
     } catch (err) {
       console.error("Trip submission failed:", err.message);
@@ -258,13 +261,13 @@ function TripForm({ onAddTrip, prefilled = {} }) {
       <input
         type="number"
         name="budget"
-        placeholder="Budget ($)"
+        placeholder="Budget (INR)"
         value={formData.budget}
         onChange={handleChange}
         className="w-full mb-2 p-2 border rounded text-sm"
         readOnly={!!prefilled.budget}
         min="1"
-        title={prefilled.budget ? "Budget auto-calculated from destination card." : "Enter your own budget"}
+        title={prefilled.budget ? "Budget auto-calculated from destination card (converted to INR)." : "Enter your own budget"}
         required
       />
 

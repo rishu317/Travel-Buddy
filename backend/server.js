@@ -18,7 +18,7 @@ const tripRoutes = require("./routes/trip");
 const app = express();
 
 // ENV Variables
-const PORT = process.env.PORT || 8080;
+const PORT = process.env.PORT ;
 const MONGO_URL = process.env.MONGO_URL;
 const CORS_ORIGIN = process.env.CORS_ORIGIN;
 const JWT_SECRET = process.env.JWT_SECRET;
