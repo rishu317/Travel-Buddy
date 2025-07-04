@@ -1,5 +1,5 @@
 import React from "react";
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { useCookies } from "react-cookie";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
@@ -32,20 +32,26 @@ import ChatBoard from "./Pages/ChatBoard";
 import Profile from "./Pages/Profile";
 import MyTrip from "./Pages/MyTrip";
 
-function App() {
-  const [cookie, setCookie] = useCookies(["token"]);
+function AppContent() {
+  const [cookie] = useCookies(["token"]);
+  const location = useLocation();
+
+  // Check if current path is /login or /signup
+  const hideHeaderFooter = ["/login", "/signup"].includes(location.pathname);
+
   return (
-    <Router>
-      <Navbar />
+    <>
+      {!hideHeaderFooter && <Navbar />}
+
       {cookie.token ? (
         <Routes>
-          /* Logged In Routes */
+          {/* Logged In Routes */}
           <Route path="/" element={<Login />} />
           <Route path="/home" element={<LoggedInHome />} />
           <Route path="/plan" element={<PlanTrip />} />
           <Route path="/blog" element={<Blog />} />
           <Route path="/contact" element={<Contact />} />
-          {/* Destination Routs */}
+          {/* Destinations */}
           <Route path="/destinations" element={<Destinations />} />
           <Route path="/destinations/india" element={<IndiaDest />} />
           <Route path="/destinations/england" element={<EnglandDest />} />
@@ -53,7 +59,6 @@ function App() {
           <Route path="/destinations/nepal" element={<NepalDest />} />
           <Route path="/destinations/pakistan" element={<PakistanDest />} />
           <Route path="/destinations/usa" element={<UsaDest />} />
-          <Route path="/destinations/pakistan" element={<PakistanDest />} />
           <Route path="/destinations/newzealand" element={<NewZealandDest />} />
           <Route path="/destinations/costarice" element={<CostaRicaDest />} />
           <Route path="/destinations/iceland" element={<IcelandDest />} />
@@ -65,26 +70,31 @@ function App() {
           <Route path="/profile" element={<Profile />} />
           <Route path="/my-trips" element={<MyTrip />} />
 
-
-          <Route path="chatboard" element={<ChatBoard />} />
+          <Route path="/chatboard" element={<ChatBoard />} />
           <Route path="/blog/:id" element={<BlogDetail />} />
           <Route path="/about" element={<About />} />
           <Route path="/service" element={<ServiceAndPolicy />} />
           <Route path="*" element={<Navigate to="/home" />} />
-          
         </Routes>
-      )
-      :
-      (
+      ) : (
         <Routes>
-          /* Logged out Routes */
+          {/* Logged Out Routes */}
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/home" element={<Home />} />
           <Route path="*" element={<Navigate to="/login" />} />
         </Routes>
       )}
-      <Footer />
+
+      {!hideHeaderFooter && <Footer />}
+    </>
+  );
+}
+
+function App() {
+  return (
+    <Router>
+      <AppContent />
     </Router>
   );
 }

@@ -14,6 +14,7 @@ const cors = require("cors");
 const User = require("./modals/User");
 const authRoutes = require("./routes/auth");
 const tripRoutes = require("./routes/trip");
+const ratingRoutes = require("./routes/rating");
 
 const app = express();
 
@@ -64,6 +65,7 @@ app.get("/", (req, res) => {
 
 app.use("/auth", authRoutes);
 app.use("/trip", tripRoutes);
+app.use("/api/rating", ratingRoutes);
 
 // Start the server
 app.listen(PORT, () => {

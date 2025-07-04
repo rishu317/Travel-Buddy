@@ -1,23 +1,21 @@
 const TextInput = ({
-    type,
-    label,
-    placeholder,
-    className,
-    value,
-    setValue,
-    labelClassName,
+  type,
+  placeholder,
+  className,
+  value,
+  setValue,
 }) => {
-    return (
-        <div className={`textInputDiv flex flex-col w-full ${className}`}>
-            <input
-                type={type}
-                placeholder={placeholder}
-                className="p-3 border border-gray-400 rounded-full placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-yellow-500"
-                value={value}
-                onChange={(e) => setValue(e.target.value)}
-            />
-        </div>
-    );
+  return (
+    <div className={`flex flex-col w-full ${className}`}>
+      <input
+        type={type}
+        placeholder={placeholder}
+        className="p-2 text-sm border border-gray-300 rounded-full placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-yellow-400"
+        value={value}
+        onChange={(e) => setValue(e.target.value)}
+      />
+    </div>
+  );
 };
 
 export default TextInput;

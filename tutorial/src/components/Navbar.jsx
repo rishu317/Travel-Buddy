@@ -3,7 +3,6 @@ import { useState, useEffect } from "react";
 import { useCookies } from "react-cookie";
 import { FaBars, FaTimes, FaMoon, FaSun } from "react-icons/fa";
 import { makeAuthenticatedGETRequest } from "../utils/serverHelpers";
-import rishu from "../assets/images/rishu.jpg";
 
 function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -53,38 +52,40 @@ function Navbar() {
   const toggleMenu = () => setIsOpen(!isOpen);
 
   return (
-    <nav className="bg-blue-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 shadow-md sticky top-0 z-50 transition-colors duration-500">
-      <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+    <header className="bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-100 shadow-sm sticky top-0 z-50">
+      <div className="max-w-7xl mx-auto px-4 md:px-6 flex justify-between items-center py-3">
+        {/* Logo */}
         <Link
           to="/home"
-          className="text-4xl font-bold flex items-center gap-1 transition-transform duration-300 hover:scale-105"
+          className="text-3xl font-extrabold tracking-tight text-blue-600 dark:text-blue-400 flex gap-1"
         >
-          <span className="text-5xl font-serif text-blue-800 dark:text-blue-300">Travel</span>
-          <span className="text-2xl font-normal text-blue-600 dark:text-blue-400">Buddy</span>
+          Travel<span className="text-xl text-blue-400 dark:text-blue-300">Buddy</span>
         </Link>
 
-        <div className="hidden md:flex gap-6 justify-center items-center mr-28">
+        {/* Desktop Navigation */}
+        <nav className="hidden md:flex gap-6">
           {navLinks.map((link) => (
             <NavLink
               key={link.name}
               to={link.path}
               className={({ isActive }) =>
-                `text-lg transition-colors duration-200 ${
+                `text-sm font-medium transition ${
                   isActive
-                    ? "font-bold text-blue-900 dark:text-blue-300"
-                    : "text-gray-700 dark:text-gray-300 hover:text-blue-700 dark:hover:text-blue-400"
-                }`
+                    ? "text-blue-600 dark:text-blue-300 border-b-2 border-blue-400"
+                    : "text-gray-700 dark:text-gray-300 hover:text-blue-500"
+                } pb-1`
               }
             >
               {link.name}
             </NavLink>
           ))}
-        </div>
+        </nav>
 
-        <div className="hidden md:flex gap-4 items-center">
+        {/* Actions */}
+        <div className="hidden md:flex items-center gap-4">
           <button
             onClick={toggleTheme}
-            className="p-2 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white hover:scale-110 transition duration-300"
+            className="rounded-full p-2 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600"
             title="Toggle Theme"
           >
             {theme === "light" ? <FaMoon /> : <FaSun />}
@@ -92,8 +93,8 @@ function Navbar() {
 
           <Link
             to="/chatboard"
-            className="text-xl hover:scale-125 transition-transform duration-200"
-            title="Open Chat Board"
+            className="text-lg hover:text-blue-500"
+            title="Chat Board"
           >
             ✨
           </Link>
@@ -106,32 +107,39 @@ function Navbar() {
                     ? userDp.startsWith("http")
                       ? userDp
                       : `http://localhost:8080${userDp}`
-                    : ""
+                    : "https://via.placeholder.com/40x40?text=👤"
                 }
                 alt="Profile"
-                className="w-10 h-10 rounded-full object-cover border-black shadow hover:scale-110 transition duration-300"
+                className="w-9 h-9 rounded-full border shadow object-cover hover:scale-105 transition"
               />
             </Link>
           )}
         </div>
 
-        <div className="md:hidden text-2xl cursor-pointer" onClick={toggleMenu}>
-          {isOpen ? <FaTimes /> : <FaBars />}
+        {/* Mobile Menu Button */}
+        <div className="md:hidden">
+          <button
+            onClick={toggleMenu}
+            className="text-2xl text-gray-700 dark:text-gray-200"
+          >
+            {isOpen ? <FaTimes /> : <FaBars />}
+          </button>
         </div>
       </div>
 
+      {/* Mobile Menu */}
       {isOpen && (
-        <div className="md:hidden px-4 pb-4 space-y-4 transition-all duration-300 ease-in-out">
+        <div className="md:hidden bg-white dark:bg-gray-800 shadow-md px-4 py-3 space-y-2">
           {navLinks.map((link) => (
             <NavLink
               key={link.name}
               to={link.path}
               onClick={() => setIsOpen(false)}
               className={({ isActive }) =>
-                `block text-base py-1 transition-colors duration-200 ${
+                `block text-base py-1 ${
                   isActive
-                    ? "text-blue-700 dark:text-blue-300 font-semibold"
-                    : "text-gray-800 dark:text-gray-200 hover:text-blue-600 dark:hover:text-blue-300"
+                    ? "text-blue-600 dark:text-blue-300 font-semibold"
+                    : "text-gray-800 dark:text-gray-200 hover:text-blue-500"
                 }`
               }
             >
@@ -141,17 +149,16 @@ function Navbar() {
 
           <Link
             to="/chatboard"
-            className="text-xl hover:scale-125 transition-transform duration-200 block"
-            title="Open Chat Board"
+            onClick={() => setIsOpen(false)}
+            className="block text-lg py-1 hover:text-blue-500"
           >
             ✨ Chat Board
           </Link>
 
-          <div className="flex items-center justify-between mt-3">
+          <div className="flex justify-between items-center mt-3">
             <button
               onClick={toggleTheme}
-              className="p-2 bg-gray-300 dark:bg-gray-700 rounded-full text-gray-900 dark:text-white"
-              title="Toggle Theme"
+              className="rounded-full p-2 bg-gray-200 dark:bg-gray-700"
             >
               {theme === "light" ? <FaMoon /> : <FaSun />}
             </button>
@@ -164,17 +171,17 @@ function Navbar() {
                       ? userDp.startsWith("http")
                         ? userDp
                         : `http://localhost:8080${userDp}`
-                      : ""
+                      : "https://via.placeholder.com/40x40?text=👤"
                   }
                   alt="Profile"
-                  className="w-9 h-9 rounded-full object-cover border border-blue-500 shadow"
+                  className="w-8 h-8 rounded-full border shadow object-cover"
                 />
               </Link>
             )}
           </div>
         </div>
       )}
-    </nav>
+    </header>
   );
 }
 

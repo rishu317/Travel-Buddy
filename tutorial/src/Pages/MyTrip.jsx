@@ -9,6 +9,7 @@ function MyTrip() {
   const [trips, setTrips] = useState([]);
   const [editingTrip, setEditingTrip] = useState(null);
   const [formData, setFormData] = useState({});
+  const [selectedTrips, setSelectedTrips] = useState(new Set());
 
   useEffect(() => {
     fetchTrips();
@@ -18,6 +19,7 @@ function MyTrip() {
     try {
       const res = await makeAuthenticatedGETRequest("/trip/my");
       setTrips(res);
+      setSelectedTrips(new Set());
     } catch (error) {
       toast.error("Failed to load trips.");
     }
@@ -59,20 +61,36 @@ function MyTrip() {
     }
   };
 
+  const handleSelect = (id) => {
+    setSelectedTrips((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(id)) newSet.delete(id);
+      else newSet.add(id);
+      return newSet;
+    });
+  };
+
   const exportToPDF = () => {
     const doc = new jsPDF();
     doc.setFontSize(18);
     doc.text("My Trips", 14, 22);
 
-    const tableData = trips.map((trip, index) => [
-      index + 1,
-      trip.name,
-      trip.from,
-      trip.destination,
-      `₹${trip.budget}`,
-      `${trip.duration} days`,
-      new Date(trip.date).toLocaleDateString(),
-    ]);
+    const tableData = trips
+      .filter((trip) => selectedTrips.has(trip._id))
+      .map((trip, index) => [
+        index + 1,
+        trip.name,
+        trip.from,
+        trip.destination,
+        `₹${trip.budget}`,
+        `${trip.duration} days`,
+        new Date(trip.date).toLocaleDateString(),
+      ]);
+
+    if (tableData.length === 0) {
+      toast.warn("No trips selected for PDF.");
+      return;
+    }
 
     autoTable(doc, {
       head: [["#", "Name", "From", "To", "Budget", "Duration", "Date"]],
@@ -84,32 +102,42 @@ function MyTrip() {
   };
 
   return (
-    <div className="min-h-screen px-6 py-10 bg-gradient-to-br from-rose-100 via-white to-sky-100">
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-3xl font-bold text-blue-700">🧭 My Trips</h2>
+    <div className="min-h-screen px-6 py-10 bg-gradient-to-br from-sky-50 via-white to-rose-50">
+      <div className="flex items-center justify-between mb-8">
+        <h2 className="text-4xl font-bold text-blue-800"> My Trips</h2>
         {trips.length > 0 && (
           <button
             onClick={exportToPDF}
-            className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
+            className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition shadow"
           >
-            <FaDownload /> Download PDF
+            <FaDownload />Download PDF
           </button>
         )}
       </div>
 
       {trips.length === 0 ? (
-        <p className="text-center text-gray-500 text-lg">No trips found.</p>
+        <p className="text-center text-gray-600 text-lg">You have no trips planned yet.</p>
       ) : (
-        <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3">
+        <div className="grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
           {trips.map((trip) => (
             <div
               key={trip._id}
-              className="bg-white border rounded-2xl shadow-lg p-5 hover:shadow-xl transition duration-300"
+              className="relative bg-white border rounded-xl shadow-md p-5 hover:shadow-lg transition duration-300"
             >
+              <div className="absolute top-3 right-3">
+                <input
+                  type="checkbox"
+                  checked={selectedTrips.has(trip._id)}
+                  onChange={() => handleSelect(trip._id)}
+                  className="h-5 w-5 text-blue-600"
+                  title="Select for PDF"
+                />
+              </div>
+
               {editingTrip === trip._id ? (
                 <form className="space-y-2">
                   <div>
-                    <label className="block text-sm font-semibold">Name</label>
+                    <label className="block text-sm font-medium">Name</label>
                     <input
                       name="name"
                       value={formData.name}
@@ -118,7 +146,7 @@ function MyTrip() {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-semibold">From</label>
+                    <label className="block text-sm font-medium">From</label>
                     <input
                       name="from"
                       value={formData.from}
@@ -127,7 +155,7 @@ function MyTrip() {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-semibold">Destination</label>
+                    <label className="block text-sm font-medium">Destination</label>
                     <input
                       name="destination"
                       value={formData.destination}
@@ -137,7 +165,7 @@ function MyTrip() {
                   </div>
                   <div className="flex gap-2">
                     <div className="flex-1">
-                      <label className="block text-sm font-semibold">Budget</label>
+                      <label className="block text-sm font-medium">Budget</label>
                       <input
                         name="budget"
                         value={formData.budget}
@@ -147,7 +175,7 @@ function MyTrip() {
                       />
                     </div>
                     <div className="flex-1">
-                      <label className="block text-sm font-semibold">Duration</label>
+                      <label className="block text-sm font-medium">Duration</label>
                       <input
                         name="duration"
                         value={formData.duration}
@@ -158,7 +186,7 @@ function MyTrip() {
                     </div>
                   </div>
                   <div>
-                    <label className="block text-sm font-semibold">Date</label>
+                    <label className="block text-sm font-medium">Date</label>
                     <input
                       name="date"
                       value={formData.date?.split("T")[0]}
@@ -171,14 +199,14 @@ function MyTrip() {
                     <button
                       onClick={handleUpdate}
                       type="button"
-                      className="bg-green-600 text-white px-4 py-1 rounded hover:bg-green-700"
+                      className="bg-green-600 text-white px-4 py-1 rounded hover:bg-green-700 shadow"
                     >
                       Save
                     </button>
                     <button
                       onClick={() => setEditingTrip(null)}
                       type="button"
-                      className="text-sm text-gray-600 hover:underline"
+                      className="text-sm text-gray-500 hover:underline"
                     >
                       Cancel
                     </button>
@@ -186,26 +214,29 @@ function MyTrip() {
                 </form>
               ) : (
                 <>
-                  <h3 className="text-xl font-bold mb-1">{trip.name}</h3>
-                  <p className="text-sm mb-1">
+                  <h3 className="text-xl font-bold text-gray-800 mb-1">{trip.name}</h3>
+                  <p className="text-sm text-gray-600 mb-1">
                     From <strong>{trip.from}</strong> to <strong>{trip.destination}</strong>
                   </p>
-                  <p className="text-sm mb-1">
-                    Budget: ₹{trip.budget} | Days: {trip.duration}
+                  <p className="text-sm text-gray-600 mb-1">
+                    Budget: <span className="font-semibold text-green-700">₹{trip.budget}</span> | Days:{" "}
+                    <span className="font-semibold">{trip.duration}</span>
                   </p>
-                  <p className="text-sm mb-3">
+                  <p className="text-sm text-gray-600 mb-3">
                     Date: <strong>{trip.date?.split("T")[0]}</strong>
                   </p>
-                  <div className="flex gap-3">
+                  <div className="flex gap-4 mt-2">
                     <button
                       onClick={() => handleEdit(trip)}
                       className="text-blue-600 hover:text-blue-800"
+                      title="Edit"
                     >
                       <FaEdit />
                     </button>
                     <button
                       onClick={() => handleDelete(trip._id)}
                       className="text-red-600 hover:text-red-800"
+                      title="Delete"
                     >
                       <FaTrashAlt />
                     </button>
